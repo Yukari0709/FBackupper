@@ -3,6 +3,9 @@
 
 #include <iostream>
 #include <filesystem>
+#include <chrono>
+#include <sstream>
+#include <vector>
 #include "CLI11.hpp"
 
 #ifdef _WIN32
@@ -15,14 +18,17 @@ typedef struct Paras{
     bool help;
     bool backup;
     bool restore;
+    bool list;
     std::string input_path;
     std::string output_path;
     bool compress;
     bool encrypt;
     std::string password;
     std::string re_name;
+    std::vector<int> size;
+    std::vector<std::string> time;
 
-    Paras() : backup(false), restore(false), compress(false), encrypt(false), help(false){}
+    Paras() : backup(false), restore(false), compress(false), encrypt(false), help(false), list(false){}
 }Paras;
 
 void Usage();

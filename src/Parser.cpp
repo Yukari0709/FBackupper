@@ -32,11 +32,11 @@ std::string GetPathFromConfig(const std::string& configFilename) {
 
 void Usage(void){
     std::cout << "Usage: FBackupper [Options] [Paras] ... \n\nOptions:\n";
-    std::cout << "  -h, --help          Display this help message.\n";
+    // std::cout << "  -h, --help          Display this help message.\n";
     std::cout << "  -b, --backup        Do File Backup.\n";
     std::cout << "  -r, --restore       Do File Restore.\n";
     std::cout << "  -l, --list          List all the backupped files.\n";
-    std::cout << "  -i, --input         Specify the path of files(or directory) to be backed up.\n";
+    std::cout << "  -f, --files         Specify the path of files(or directory) to be backed up or restore.\n";
     std::cout << "      --path          View the path where the backup files are stored/\n";
     std::cout << "  -c, --compress      Compress backup packages.\n";
     std::cout << "  -e, --encrypt       Encrypt backup packages, must be used with -p!\n";
@@ -44,7 +44,7 @@ void Usage(void){
     std::cout << "\nOptions to filter backup files:\n";
     std::cout << "      --name exp      Select files using regular expressions and their names, like \'*.o\' .\n";
     std::cout << "      --size t1 t2    Select files within a specified size range, like \'1000 2000\'(Bytes).\n";
-    std::cout << "      --time t1 t2    Select files within a specified creation time range, like \'2023-12-11 20:31:12 2023-12-12 20:30:00\'.\n";
+    std::cout << "      --time t1 t2    Select files within a specified creation time range, like \'2023-12-11-20:31:12 2023-12-11-20:30:00\'.\n";
 }
 
 void initConfig(void){
@@ -81,26 +81,34 @@ void doParaParser(int argc, char **argv){
 
     app.add_flag("-b,--backup", paras.backup, "Backup");
     app.add_flag("-r,--restore", paras.restore, "Restore");
-
-    if(paras.backup && paras.restore){
-        std::cout<<"[!] Bad parameters, can not backup and restore at the same time. \n";
-        exit(0);
-    }
-
-    app.add_option("-i,--input", paras.input_path);
-    app.add_option("-o,--output", paras.output_path);
-    if(paras.backup || paras.restore){
-        if(paras.input_path.empty() || paras.output_path.empty()){
-            std::cout<<"[!] Bad parameters, please specify the input path and the output path. \n";
-            exit(0);
-        }
-    }
-
+    app.add_flag("-l,--list", paras.restore, "List");
+    app.add_option("-f,--files", paras.input_path, "Specify the path of files(or directory) to be backed up or restore.");
     app.add_flag("-c,--compress", paras.compress);
     app.add_flag("-e,--encrypt", paras.encrypt);
+    
+    app.add_option("-p,--password", paras.password);
+    app.add_option("--name", paras.re_name);
+    app.add_option("--size", paras.size);
+    app.add_option("--time", paras.time);
+    
 
     CLI11_PARSE(app, argc, argv);
 
     // TODO: check
+
+    if(paras.backup && paras.restore){
+        std::cout<<"[!] Bad parameters, can not backup and restore at the same time. \n";
+        Usage();
+        exit(0);
+    }
+    
+    if(paras.backup || paras.restore){
+        if(paras.input_path.empty()){
+            std::cout<<"[!] Bad parameters, please specify the input path and the output path. \n";
+            Usage();
+            exit(0);
+        }
+    }
+
     return;
 }
