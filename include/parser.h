@@ -2,9 +2,17 @@
 #define INCLUDE_PARSER
 
 #include <iostream>
+#include <filesystem>
 #include "CLI11.hpp"
 
+#ifdef _WIN32
+#include <direct.h>
+#elif __APPLE__ || __linux__
+#include <unistd.h>
+#endif
+
 typedef struct Paras{
+    bool help;
     bool backup;
     bool restore;
     std::string input_path;
@@ -14,11 +22,12 @@ typedef struct Paras{
     std::string password;
     std::string re_name;
 
-    Paras() : backup(false), restore(false), compress(false), encrypt(false){}
+    Paras() : backup(false), restore(false), compress(false), encrypt(false), help(false){}
 }Paras;
 
 void Usage();
 void doParaParser(int argc, char **argv);
+void initConfig();
 
 // declare
 extern Paras paras;

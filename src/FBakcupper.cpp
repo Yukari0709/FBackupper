@@ -4,8 +4,10 @@ int main(int argc, char **argv){
 
     if(argc < 2){
         Usage();
+        exit(0);
     }
 
+    initConfig();
     // TODO : parser
     doParaParser(argc, argv);
 

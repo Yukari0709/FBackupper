@@ -5,6 +5,8 @@ lib/
 *.o
 *.a
 *.so
+# config
+*.ini
 
 # VSC
 .vscode/
