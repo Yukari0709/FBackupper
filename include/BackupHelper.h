@@ -6,12 +6,15 @@
 
 class BackupHelper{
 private:
+    std::string output_path;
+
     std::string input_path;
     const bool _compress;
     const bool _encrypt;
     std::string re_name;
     std::vector<int> size;
     std::vector<std::string> time;
+    std::string passwd;
 
     std::vector<File> all_files;
 
@@ -25,7 +28,7 @@ public:
     BackupHelper(const Paras &p);
     // ~BackupHelper();
 
-    void doBackup(std::vector<File> file_names, std::string input_path);
+    void doBackup();
     
 };
 

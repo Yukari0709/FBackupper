@@ -7,6 +7,7 @@
 #include <sstream>
 #include <vector>
 #include <sys/stat.h>
+#include <fstream>
 #include "CLI11.hpp"
 
 #ifdef _WIN32
