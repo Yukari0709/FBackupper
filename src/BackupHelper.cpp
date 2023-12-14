@@ -7,9 +7,9 @@ void BackupHelper::doBackup(){
     
     // 创建新文件
     initBackupFile();
+    
     // 打包
-
-    // doPack();
+    doPack();
 
     // 压缩
 
@@ -71,17 +71,29 @@ void BackupHelper::initBackupFile(){
     }
 
     std::string tmpfilename = generateFileName();
-    tmpfilename = output_path + tmpfilename + ".bup";
+    tmpfilename = output_path + "/" + tmpfilename + ".bup";
 
-    std::ofstream outputFile(tmpfilename);
-    if (!outputFile.is_open()) {
-        std::cout << "[!] Can not create new file. \n";
-        exit(-1);
-    }
+    // 创建新文件
 
-    outputFile.close();
+    // std::ofstream outputFile(tmpfilename);
+    // if (!outputFile.is_open()) {
+    //     std::cout << "[!] Can not create new file. \n";
+    //     exit(-1);
+    // }
+
+    // outputFile.close();
+
+    // this->bkfile_path = tmpfilename;
 
     // TODO: 写入压缩文件的头
+
+}
+
+void BackupHelper::doPack(){
+
+    // 安全性检查
+
+    // 循环读取文件，制作header，添加header和内容。
 
 
 }

@@ -56,23 +56,38 @@ void initConfig(Paras &paras){
 
     if (std::filesystem::exists(configPath)) {
         paras.output_path = GetPathFromConfig(configPath);
+
         if(paras.output_path.empty()){
             std::cout << "Bad Config file.\n";
             exit(0);
         }
+
+        if(!std::filesystem::exists(paras.output_path)){
+            if(!std::filesystem::create_directory(paras.output_path)){
+                std::cout << "[!] Can not create_directory.\n ";
+                exit(-1);
+            }
+        }
     }else{
         // Backup files database.
         std::filesystem::path backfilesPath = curPath / "Backfiles";
-        std::filesystem::create_directory(backfilesPath);
+        if(!std::filesystem::exists(backfilesPath)){
+            if(!std::filesystem::create_directory(backfilesPath)){
+                std::cout << "[!] Can not create_directory.\n ";
+                exit(-1);
+            }
+        }
 
         std::ofstream configFile(configPath);
         if (configFile.is_open()) {
-            configFile << "PATH = " << backfilesPath << std::endl;
+            configFile << "PATH = " << backfilesPath.string() << std::endl;
             configFile.close();
         } else {
             std::cerr << "Error creating Config.ini." << std::endl;
             exit(0);
         }
+
+        paras.output_path = backfilesPath.string();
 
     }
 }
@@ -86,6 +101,7 @@ void doParaParser(int argc, char **argv, Paras &paras){
     app.add_option("-f,--files", paras.input_path, "Specify the path of files(or directory) to be backed up or restore.");
     app.add_flag("-c,--compress", paras.compress);
     app.add_flag("-e,--encrypt", paras.encrypt);
+    app.add_option("-i,--input", paras.input_path);
     
     app.add_option("-p,--password", paras.password);
     app.add_option("--rename", paras.re_name);
@@ -93,6 +109,7 @@ void doParaParser(int argc, char **argv, Paras &paras){
     app.add_option("--size", paras.size);
     app.add_option("--ctime", paras.ctime);
     app.add_option("--mtime", paras.mtime);
+    
     
     app.add_option("--type", paras.typenum);
 
