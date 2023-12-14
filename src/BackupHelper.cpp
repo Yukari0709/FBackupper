@@ -4,6 +4,7 @@ void BackupHelper::doBackup(){
     // TODO：
     // doFilter();
     if(all_files.empty());
+    
     // 创建新文件
     initBackupFile();
     // 打包
@@ -53,4 +54,6 @@ void BackupHelper::initBackupFile(){
     outputFile.close();
 
     // TODO: 写入压缩文件的头
+
+
 }
