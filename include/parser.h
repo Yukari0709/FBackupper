@@ -29,6 +29,7 @@ typedef struct Paras{
     std::string re_name;
     std::vector<int> size;
     std::vector<std::string> time;
+    std::vector<int> typenum;
 
     Paras() : backup(false), restore(false), compress(false), encrypt(false), help(false), list(false){}
 }Paras;
