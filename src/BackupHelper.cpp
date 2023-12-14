@@ -44,7 +44,7 @@ void BackupHelper::processPath(const std::string& current_path) {
             std::cerr << "无效的路径或文件：" << current_path << std::endl;
         }
     } catch (const std::exception& ex) {
-        std::cerr << "处理路径时发生异常: " << ex.what() << std::endl;
+        std::cerr << "处理路径时发生异常1234: " << ex.what() << std::endl;
     }
 }
 
