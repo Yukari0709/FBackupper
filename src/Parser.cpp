@@ -1,6 +1,4 @@
 #include "parser.h"
-// definition
-Paras paras;
 
 std::string GetPathFromConfig(const std::string& configFilename) {
     std::ifstream configFile(configFilename);
@@ -47,7 +45,7 @@ void Usage(void){
     std::cout << "      --time t1 t2    Select files within a specified creation time range, like \'2023-12-11-20:31:12 2023-12-11-20:30:00\'.\n";
 }
 
-void initConfig(void){
+void initConfig(Paras &paras){
     char runPath[256] = {0};
     getcwd(runPath, sizeof(runPath));
     std::filesystem::path curPath(runPath);
@@ -76,7 +74,7 @@ void initConfig(void){
     }
 }
 
-void doParaParser(int argc, char **argv){
+void doParaParser(int argc, char **argv, Paras &paras){
     CLI::App app{"FBackupper"};
 
     app.add_flag("-b,--backup", paras.backup, "Backup");

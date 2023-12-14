@@ -32,11 +32,9 @@ typedef struct Paras{
 }Paras;
 
 void Usage();
-void doParaParser(int argc, char **argv);
-void initConfig();
+void doParaParser(int argc, char **argv, Paras &paras);
+void initConfig(Paras &paras);
 
-// declare
-extern Paras paras;
 
 #endif
 

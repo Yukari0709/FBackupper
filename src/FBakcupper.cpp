@@ -8,9 +8,11 @@ int main(int argc, char **argv){
         exit(0);
     }
 
-    initConfig();
+    
+    Paras paras;
+    initConfig(paras);
     // TODO : parser
-    doParaParser(argc, argv);
+    doParaParser(argc, argv, paras);
 
     BackupHelper b_helper(paras);
 
