@@ -13,6 +13,8 @@ private:
     std::vector<int> size;
     std::vector<std::string> time;
 
+    std::vector<File> all_files;
+
     void initBackupFile();
     void doFilter();
     void doPack();

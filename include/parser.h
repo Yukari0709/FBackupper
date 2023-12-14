@@ -6,6 +6,7 @@
 #include <chrono>
 #include <sstream>
 #include <vector>
+#include <sys/stat.h>
 #include "CLI11.hpp"
 
 #ifdef _WIN32
