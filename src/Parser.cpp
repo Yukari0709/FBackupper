@@ -40,6 +40,7 @@ void Usage(void){
     std::cout << "  -e, --encrypt       Encrypt backup packages, must be used with -p!\n";
     std::cout << "  -p, --password      Specify the compression password.\n";
     std::cout << "\nOptions to filter backup files:\n";
+    
     std::cout << "      --name exp      Select files using regular expressions and their names, like \'*.o\' .\n";
     std::cout << "      --size t1 t2    Select files within a specified size range, like \'1000 2000\'(Bytes).\n";
     std::cout << "      --time t1 t2    Select files within a specified creation time range, like \'2023-12-11-20:31:12 2023-12-11-20:30:00\'.\n";

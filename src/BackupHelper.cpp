@@ -19,7 +19,33 @@ BackupHelper::BackupHelper(const Paras &p): _compress(p.compress), _encrypt(p.en
 }
 
 void BackupHelper::doFilter(){
-    
+
+}
+
+void BackupHelper::processPath(const std::string& current_path) {
+    namespace fs = std::filesystem;
+
+    try {
+        if (fs::is_directory(current_path)) {
+            // 如果是目录，则遍历目录下的文件
+            for (const auto& entry : fs::directory_iterator(current_path)) {
+                processPath(entry.path().string());
+            }
+        } else if (fs::is_regular_file(current_path)) {
+            // 如果是文件，则将文件添加到向量中
+            File file;
+            file.name = current_path;
+            if (stat(current_path.c_str(), &file.metadata) == 0) {
+                all_files.push_back(file);
+            } else {
+                std::cerr << "无法获取文件信息：" << current_path << std::endl;
+            }
+        } else {
+            std::cerr << "无效的路径或文件：" << current_path << std::endl;
+        }
+    } catch (const std::exception& ex) {
+        std::cerr << "处理路径时发生异常: " << ex.what() << std::endl;
+    }
 }
 
 std::string generateFileName(void){

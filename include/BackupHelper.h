@@ -23,13 +23,13 @@ private:
     void doPack();
     void doCompress();
     void doEncrypt();
+    void processPath(const std::string& current_path);
 
 public:
     BackupHelper(const Paras &p);
     // ~BackupHelper();
 
     void doBackup();
-    
 };
 
 #endif
