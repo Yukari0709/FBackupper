@@ -9,6 +9,8 @@ void BackupHelper::doBackup(){
     initBackupFile();
     // 打包
 
+    // doPack();
+    
     // 压缩
 
     // 加密
