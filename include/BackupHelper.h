@@ -15,6 +15,12 @@ public:
     // ~BackupHelper();
 
     void doBackup(std::vector<File> file_names, std::string input_path);
+    
+    void initBackupFile();
+    void doFilter();
+    void doPack();
+    void doCompress();
+    void doEncrypt();
 };
 
 #endif

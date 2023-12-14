@@ -5,6 +5,7 @@
 
 typedef struct File{
     std::string name;
+    
 }File;
 
 #endif
