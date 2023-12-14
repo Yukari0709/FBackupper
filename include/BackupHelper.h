@@ -12,8 +12,10 @@ private:
     const bool _compress;
     const bool _encrypt;
     std::string re_name;
+    std::string re_path;
     std::vector<int> size;
-    std::vector<std::string> time;
+    std::vector<std::string> ctime;
+    std::vector<std::string> mtime;
     std::string passwd;
 
     std::vector<File> all_files;

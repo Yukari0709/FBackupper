@@ -31,18 +31,21 @@ std::string GetPathFromConfig(const std::string& configFilename) {
 void Usage(void){
     std::cout << "Usage: FBackupper [Options] [Paras] ... \n\nOptions:\n";
     // std::cout << "  -h, --help          Display this help message.\n";
-    std::cout << "  -b, --backup        Do File Backup.\n";
-    std::cout << "  -r, --restore       Do File Restore.\n";
-    std::cout << "  -l, --list          List all the backupped files.\n";
-    std::cout << "  -f, --files         Specify the path of files(or directory) to be backed up or restore.\n";
-    std::cout << "      --path          View the path where the backup files are stored/\n";
-    std::cout << "  -c, --compress      Compress backup packages.\n";
-    std::cout << "  -e, --encrypt       Encrypt backup packages, must be used with -p!\n";
-    std::cout << "  -p, --password      Specify the compression password.\n";
+    std::cout << "  -b, --backup            Do File Backup.\n";
+    std::cout << "  -r, --restore           Do File Restore.\n";
+    std::cout << "  -l, --list              List all the backupped files.\n";
+    std::cout << "  -f, --files             Specify the path of files(or directory) to be backed up or restore.\n";
+    std::cout << "      --path              View the path where the backup files are stored/\n";
+    std::cout << "  -c, --compress          Compress backup packages.\n";
+    std::cout << "  -e, --encrypt           Encrypt backup packages, must be used with -p!\n";
+    std::cout << "  -p, --password          Specify the compression password.\n";
     std::cout << "\nOptions to filter backup files:\n";
-    std::cout << "      --name exp      Select files using regular expressions and their names, like \'*.o\' .\n";
-    std::cout << "      --size t1 t2    Select files within a specified size range, like \'1000 2000\'(Bytes).\n";
-    std::cout << "      --time t1 t2    Select files within a specified creation time range, like \'2023-12-11-20:31:12 2023-12-11-20:30:00\'.\n";
+    std::cout << "      --repath ReguExp    Select files using regular expressions and their names, like \'*.o\' .\n";
+    std::cout << "      --rename ReguExp    Select files using regular expressions and their names, like \'*.o\' .\n";
+    std::cout << "      --size t1 t2        Select files within a specified size range, like \'1000 2000\'(Bytes).\n";
+    std::cout << "      --ctime t1 t2       Select files within a specified creation time range, like \'2023-12-11-20:31:12 2023-12-11-20:30:00\'.\n";
+    std::cout << "      --mtime t1 t2       Select files within a specified last modified time range, like \'2023-12-11-20:31:12 2023-12-11-20:30:00\'.\n";
+    std::cout << "      --type n1 n2 ...    Select types of file to be back upped: 1 -> Regular file; 2 -> Directory; 3 -> Symbolic link; 4 -> FIFO or pipe.\n";
 }
 
 void initConfig(Paras &paras){
@@ -85,10 +88,13 @@ void doParaParser(int argc, char **argv, Paras &paras){
     app.add_flag("-e,--encrypt", paras.encrypt);
     
     app.add_option("-p,--password", paras.password);
-    app.add_option("--name", paras.re_name);
+    app.add_option("--rename", paras.re_name);
+    app.add_option("--repath", paras.re_path);
     app.add_option("--size", paras.size);
-    app.add_option("--time", paras.time);
+    app.add_option("--ctime", paras.ctime);
+    app.add_option("--mtime", paras.mtime);
     
+    app.add_option("--type", paras.typenum);
 
     CLI11_PARSE(app, argc, argv);
 
@@ -96,14 +102,12 @@ void doParaParser(int argc, char **argv, Paras &paras){
 
     if(paras.backup && paras.restore){
         std::cout<<"[!] Bad parameters, can not backup and restore at the same time. \n";
-        Usage();
         exit(0);
     }
     
     if(paras.backup || paras.restore){
         if(paras.input_path.empty()){
             std::cout<<"[!] Bad parameters, please specify the input path and the output path. \n";
-            Usage();
             exit(0);
         }
     }
