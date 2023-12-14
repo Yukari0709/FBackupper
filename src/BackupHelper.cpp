@@ -4,16 +4,19 @@ void BackupHelper::doBackup(){
     // TODO：
     // doFilter();
     if(all_files.empty());
+    
     // 创建新文件
     initBackupFile();
     // 打包
+
+    // doPack();
 
     // 压缩
 
     // 加密
 }
 
-BackupHelper::BackupHelper(const Paras &p): _compress(p.compress), _encrypt(p.encrypt), re_name(p.re_name), size(p.size), time(p.time), passwd(p.password){
+BackupHelper::BackupHelper(const Paras &p): _compress(p.compress), _encrypt(p.encrypt), re_name(p.re_name), size(p.size), ctime(p.ctime), mtime(p.mtime), passwd(p.password){
     input_path = p.input_path;
     output_path = p.output_path;
 }
@@ -79,4 +82,6 @@ void BackupHelper::initBackupFile(){
     outputFile.close();
 
     // TODO: 写入压缩文件的头
+
+
 }

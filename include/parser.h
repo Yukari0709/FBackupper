@@ -27,8 +27,10 @@ typedef struct Paras{
     bool encrypt;
     std::string password;
     std::string re_name;
+    std::string re_path;
     std::vector<int> size;
-    std::vector<std::string> time;
+    std::vector<std::string> ctime;
+    std::vector<std::string> mtime;
     std::vector<int> typenum;
 
     Paras() : backup(false), restore(false), compress(false), encrypt(false), help(false), list(false){}
