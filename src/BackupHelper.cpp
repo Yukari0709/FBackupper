@@ -24,7 +24,7 @@ void BackupHelper::doFilter(){
 
 void BackupHelper::processPath(const std::string& current_path) {
     namespace fs = std::filesystem;
-
+    
     try {
         if (fs::is_directory(current_path)) {
             // 如果是目录，则遍历目录下的文件
