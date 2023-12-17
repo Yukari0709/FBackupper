@@ -3,19 +3,23 @@
 std::map<ino_t, std::string> inoToStringMap;
 
 void BackupHelper::doBackup(){
-    // TODO：
-    // doFilter();
-    if(all_files.empty());
-    
+
+    doFilter();
+    if(all_files.empty() | all_files.size() == 1){
+        std::cout << "[!] Bad parameter, please check your input path.\n";
+        exit(-1);
+    }
+
     // 创建新文件
     initBackupFile();
     
     // 打包
     doPack();
 
-    // 压缩
+    std::cout << "[+] Finish packing into file: " << this->bkfile_path << std::endl;
 
-    // 加密
+
+
 }
 
 BackupHelper::BackupHelper(const Paras &p): _compress(p.compress), _encrypt(p.encrypt), re_name(p.re_name), size(p.size), ctime(p.ctime), mtime(p.mtime), passwd(p.password){
@@ -26,7 +30,7 @@ BackupHelper::BackupHelper(const Paras &p): _compress(p.compress), _encrypt(p.en
 void BackupHelper::doFilter(){
     processPath(input_path);
     for (const auto &element : all_files){
-        std::cout << element.name << " ";
+        // std::cout << element.name << std::endl;
     }
     if(!ctime.empty()){
         for (auto it = all_files.begin(); it != all_files.end(); ) {
@@ -38,10 +42,7 @@ void BackupHelper::doFilter(){
         }
      }
     }
-    
-    for (const auto &element : all_files){
-        std::cout << element.name << " ";
-    }
+
 }
 
 void BackupHelper::processPath(const std::string& current_path) {
@@ -155,45 +156,36 @@ void BackupHelper::initBackupFile(){
 
 }
 
+std::filesystem::path changeRELtoABS(std::filesystem::path &path, char *rel_path){
+
+    // 如果rel_path已经是绝对路径，不进行转换
+    std::string str(rel_path);
+    if(str.front() != '.'){
+        std::filesystem::path tmp1(str);
+        return tmp1;
+    }
+
+    std::istringstream iss(rel_path);
+    std::string token;
+
+    std::filesystem::path tmp = path.parent_path();
+    
+    while (std::getline(iss, token, '/')) {
+        if(token == "."){
+            tmp = tmp;
+        }
+        else if(token == ".."){
+            tmp = tmp.parent_path();
+        }
+        else{
+            tmp /= token;
+        };
+    }
+
+    return tmp;
+}
+
 void BackupHelper::doPack(){
-
-    // For develop
-    File tmp0; // 第一个文件一定是代表文件夹的特殊文件
-    std::string path_to_test = "/home/jiangshao/Filebackup";
-    tmp0.name = "test";
-    if (stat(this->input_path.c_str(), &tmp0.metadata) != 0){
-        std::cout << "[!] ERROR: Can not get metadata for 123. \n";
-        exit(-1);
-    }
-    this->all_files.push_back(tmp0);
-
-    File tmp;
-    tmp.name = "test/123";
-    std::string tmp_path = path_to_test + '/' + tmp.name;
-    if (stat(tmp_path.c_str(), &tmp.metadata) != 0){
-        std::cout << "[!] ERROR: Can not get metadata for 123. \n";
-        exit(-1);
-    }
-    this->all_files.push_back(tmp);
-
-    File tmp1;
-    tmp1.name = "test/456";
-    tmp_path = path_to_test + '/' + tmp1.name;
-    if (stat(tmp_path.c_str(), &tmp1.metadata) != 0){
-        std::cout << "[!] ERROR: Can not get metadata for 123. \n";
-        exit(-1);
-    }
-    this->all_files.push_back(tmp1);
-
-    File tmp2;
-    tmp2.name = "test/sym_link";
-    tmp_path = path_to_test + '/' + tmp2.name;
-    if (stat(tmp_path.c_str(), &tmp2.metadata) != 0){
-        std::cout << "[!] ERROR: Can not get metadata for 123. \n";
-        exit(-1);
-    }    
-    this->all_files.push_back(tmp2);
-    // For develop
 
     // check output file
     if(access(bkfile_path.c_str(), W_OK) != 0){
@@ -205,26 +197,28 @@ void BackupHelper::doPack(){
     std::filesystem::path parentPath = i_path.parent_path();
 
     for(const File &elem : all_files){
-        // check whether file can be readed
-        // input_path和name有重合的地方，需要处理一下
+
+        std::cout << "[*] Packing file: " << elem.name << std::endl;
 
         std::filesystem::path backPath = parentPath / elem.name;
 
         if (std::filesystem::is_symlink(backPath)) {
             // 处理sym link文件
             char targetPath[100];
+            // 这里可能获得相对路径，比如./，我们需要转换为绝对路径
             ssize_t bytesRead = readlink(backPath.c_str(), targetPath, 100 - 1);
             if (bytesRead != -1) {
                 targetPath[bytesRead] = '\0';
             }
 
-            // 如果源文件也要备份，那么先备份源文件。
+            // 相对路径转换为绝对路径，备份symlink的思路是保持链接对象
+            std::filesystem::path abs_p = changeRELtoABS(backPath, targetPath);
+            // std::cout << abs_p << std::endl;
 
             // elem的metadata要更新，用lstat重新获取
             lstat(backPath.c_str(), &elem.metadata);
             Pack pack(elem, backPath);
-            pack.write_one_bkfile_into(bkfile_path, targetPath);
-
+            pack.write_one_bkfile_into(bkfile_path, abs_p.c_str());
         }
         else if(elem.metadata.st_nlink > 1){
             // 处理hard link文件
@@ -232,14 +226,16 @@ void BackupHelper::doPack(){
             auto it = inoToStringMap.find(linkedInode);
 
             if (it != inoToStringMap.end()) {
+                // 源文件已备份
                 const char * link_t = it->second.c_str();
 
                 Pack pack(elem, backPath);
                 pack.write_one_bkfile_into(bkfile_path, link_t);
             } else{
-
+                // 源文件未备份，该文件即为源文件
                 inoToStringMap[linkedInode] = elem.name;
 
+                // 注，默认该文件为普通文件，不处理嵌套链接
                 Pack pack(elem, backPath);
                 pack.write_one_bkfile_into(bkfile_path);
             }

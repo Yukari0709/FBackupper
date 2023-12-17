@@ -1,5 +1,35 @@
 #include "parser.h"
 
+std::filesystem::path changeRELtoABS1(std::filesystem::path &path, char *rel_path){
+
+    // 如果rel_path已经是绝对路径，不进行转换
+    std::string str(rel_path);
+    if(str.front() != '.'){
+        std::filesystem::path tmp1(str);
+        return tmp1;
+    }
+
+    std::istringstream iss(rel_path);
+    std::string token;
+
+    // 对这个场景的适配
+    std::filesystem::path tmp = path;
+    
+    while (std::getline(iss, token, '/')) {
+        if(token == "."){
+            tmp = tmp;
+        }
+        else if(token == ".."){
+            tmp = tmp.parent_path();
+        }
+        else{
+            tmp /= token;
+        };
+    }
+
+    return tmp;
+}
+
 std::string GetPathFromConfig(const std::string& configFilename) {
     std::ifstream configFile(configFilename);
     std::string line;
@@ -34,8 +64,9 @@ void Usage(void){
     std::cout << "  -b, --backup            Do File Backup.\n";
     std::cout << "  -r, --restore           Do File Restore.\n";
     std::cout << "  -l, --list              List all the backupped files.\n";
-    std::cout << "  -f, --files             Specify the path of files(or directory) to be backed up or restore.\n";
-    std::cout << "      --path              View the path where the backup files are stored/\n";
+    std::cout << "  -i, --input         Specify the path of files(or directory) to be backed up or restore.\n";
+    std::cout << "  -o, --output         Specify where the path of RESTORE files.\n";
+    // std::cout << "      --path              View the path where the backup files are stored/\n";
     std::cout << "  -c, --compress          Compress backup packages.\n";
     std::cout << "  -e, --encrypt           Encrypt backup packages, must be used with -p!\n";
     std::cout << "  -p, --password          Specify the compression password.\n";
@@ -102,6 +133,7 @@ void doParaParser(int argc, char **argv, Paras &paras){
     app.add_flag("-c,--compress", paras.compress);
     app.add_flag("-e,--encrypt", paras.encrypt);
     app.add_option("-i,--input", paras.input_path);
+    app.add_option("-o,--output", paras.rec_path);
     
     app.add_option("-p,--password", paras.password);
     app.add_option("--rename", paras.re_name);
@@ -129,5 +161,26 @@ void doParaParser(int argc, char **argv, Paras &paras){
         }
     }
 
+    // 处理输入的path
+    if(paras.backup){
+        if(paras.input_path.back() == '/'){
+            paras.input_path.pop_back();
+        }
+        // 将相对路径转换为绝对
+        std::filesystem::path currentPath = std::filesystem::current_path();
+
+        std::filesystem::path tmp = changeRELtoABS1(currentPath, paras.input_path.c_str());
+
+        paras.input_path = tmp.string();
+    }
+
+    if(paras.restore){
+        std::filesystem::path currentPath = std::filesystem::current_path();
+        std::filesystem::path tmp = changeRELtoABS1(currentPath, paras.output_path.c_str());
+
+        paras.output_path = tmp.string();
+    }
+
     return;
 }
+

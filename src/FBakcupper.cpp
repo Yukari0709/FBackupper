@@ -1,5 +1,6 @@
 #include "parser.h"
 #include "BackupHelper.h"
+#include "RestoreHelper.h"
 
 int main(int argc, char **argv){
 
@@ -14,16 +15,20 @@ int main(int argc, char **argv){
     // TODO : parser
     doParaParser(argc, argv, paras);
 
-    BackupHelper b_helper(paras);
-
     if(paras.backup){
+        
+        BackupHelper b_helper(paras);
 
-        // TODO: 设置备份参数，是否压缩，是否加密，加密密码。
+        b_helper.doBackup();
 
-        // TODO： 过滤文件，返回vector类型的文件列表。
+        // TODO: 压缩，加密
+    }
+    else if(paras.restore){
+        // TODO: 解压，解密
 
-        // b_helper.doBackup();
-        // b_helper.doFilter();
+        RestoreHelper r_helper(paras);
+        r_helper.doRestore();
+        
     }
 }
 

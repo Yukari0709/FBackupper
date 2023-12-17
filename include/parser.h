@@ -11,6 +11,8 @@
 #include <cstdint>
 #include <cstring>
 #include <fstream>
+#include <sys/types.h>
+#include <fcntl.h> 
 #include "CLI11.hpp"
 
 #ifdef _WIN32
@@ -26,6 +28,7 @@ typedef struct Paras{
     bool list;
     std::string input_path;
     std::string output_path;
+    std::string rec_path;
     bool compress;
     bool encrypt;
     std::string password;

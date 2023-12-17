@@ -12,7 +12,7 @@ struct Header
     char link_target[100];
 
     Header(): magicNumber(HEADER_MAGIC_NUMBER), name{}, link_target{} {}
-}; // 348 byte header
+}; // 352 byte header
 
 class Pack{
 private:
@@ -21,6 +21,9 @@ private:
 
     Header_for_one_file header;
     std::string LNK_Target;
+    
+    // 恢复的时候读取到的pack头
+    Header restore_header;
 
     void get_file_data();
 
@@ -33,6 +36,11 @@ public:
     void write_one_bkfile_into(std::string dest_filepath);
     // Use when back link files
     void write_one_bkfile_into(std::string dest_filepath, char * target);
+
+    // Use when restore file from a header.
+    void restore_from_header(std::filesystem::path &path, std::ifstream& inputFile);
 };
+
+extern std::map<ino_t, std::string> rec_inomap;
 
 #endif

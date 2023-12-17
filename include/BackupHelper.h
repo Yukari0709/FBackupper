@@ -47,6 +47,8 @@ public:
     void getctimetrans();
 };
 
+std::filesystem::path changeRELtoABS(std::filesystem::path &path, char *rel_path);
+
 extern std::map<ino_t, std::string> inoToStringMap;
 
 #endif
