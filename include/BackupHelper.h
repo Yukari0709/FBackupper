@@ -21,17 +21,26 @@ private:
     std::vector<File> all_files;
 
     void initBackupFile();
-    void doFilter();
+   
     void doPack();
     void doCompress();
     void doEncrypt();
     void processPath(const std::string& current_path);
+    bool checkFilesCreationTime(const struct stat& metadata);
+    bool checkFilesModifyTime(const struct stat& metadata);
+    bool checkFilesSize(const struct stat& metadata);
+    bool checkFilesAddress(const struct stat& metadata);
+    bool checkFilesName(const struct stat& metadata);
+    bool checkFilesType(const struct stat& metadata);
 
 public:
     BackupHelper(const Paras &p);
     // ~BackupHelper();
 
     void doBackup();
+    void doFilter();
+    void getctime();
+    void getctimetrans();
 };
 
 #endif

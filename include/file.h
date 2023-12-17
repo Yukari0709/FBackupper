@@ -5,6 +5,7 @@
 
 typedef struct File{
     std::string name;
+    std::string path;
     struct stat metadata;
 //     struct stat {
 //     dev_t     st_dev;         // 文件所在设备的设备号

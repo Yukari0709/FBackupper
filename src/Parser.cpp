@@ -86,6 +86,7 @@ void doParaParser(int argc, char **argv, Paras &paras){
     app.add_option("-f,--files", paras.input_path, "Specify the path of files(or directory) to be backed up or restore.");
     app.add_flag("-c,--compress", paras.compress);
     app.add_flag("-e,--encrypt", paras.encrypt);
+    app.add_option("-i,--input", paras.input_path);
     
     app.add_option("-p,--password", paras.password);
     app.add_option("--rename", paras.re_name);
