@@ -3,6 +3,7 @@
 
 #include "parser.h"
 #include "file.h"
+#include "Pack.h"
 
 class BackupHelper{
 private:

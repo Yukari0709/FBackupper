@@ -74,16 +74,15 @@ void BackupHelper::initBackupFile(){
     tmpfilename = output_path + "/" + tmpfilename + ".bup";
 
     // 创建新文件
+    std::ofstream outputFile(tmpfilename);
+    if (!outputFile.is_open()) {
+        std::cout << "[!] Can not create new file. \n";
+        exit(-1);
+    }
 
-    // std::ofstream outputFile(tmpfilename);
-    // if (!outputFile.is_open()) {
-    //     std::cout << "[!] Can not create new file. \n";
-    //     exit(-1);
-    // }
+    outputFile.close();
 
-    // outputFile.close();
-
-    // this->bkfile_path = tmpfilename;
+    this->bkfile_path = tmpfilename;
 
     // TODO: 写入压缩文件的头
 
@@ -91,9 +90,61 @@ void BackupHelper::initBackupFile(){
 
 void BackupHelper::doPack(){
 
-    // 安全性检查
+    // For develop
+    File tmp0; // 第一个文件一定是代表文件夹的特殊文件
+    std::string path_to_test = "/home/jiangshao/Filebackup";
+    tmp0.name = "test";
+    if (stat(this->input_path.c_str(), &tmp0.metadata) != 0){
+        std::cout << "[!] ERROR: Can not get metadata for 123. \n";
+        exit(-1);
+    }
+    this->all_files.push_back(tmp0);
 
-    // 循环读取文件，制作header，添加header和内容。
+    File tmp;
+    tmp.name = "test/123";
+    std::string tmp_path = path_to_test + '/' + tmp.name;
+    if (stat(tmp_path.c_str(), &tmp.metadata) != 0){
+        std::cout << "[!] ERROR: Can not get metadata for 123. \n";
+        exit(-1);
+    }
+    this->all_files.push_back(tmp);
 
+    File tmp1;
+    tmp1.name = "test/456";
+    tmp_path = path_to_test + '/' + tmp1.name;
+    if (stat(tmp_path.c_str(), &tmp1.metadata) != 0){
+        std::cout << "[!] ERROR: Can not get metadata for 123. \n";
+        exit(-1);
+    }
+    this->all_files.push_back(tmp1);
+    // For develop
+
+    // check output file
+    if(access(bkfile_path.c_str(), W_OK) != 0){
+        std::cerr << "[!] Can not write to bk file. \n";
+        exit(-1);
+    }
+
+    for(const File &elem : all_files){
+
+        // check whether file can be readed
+        // input_path和name有重合的地方，需要处理一下
+        std::filesystem::path i_path = this->input_path;
+        std::filesystem::path parentPath = i_path.parent_path();
+
+        std::filesystem::path backPath = parentPath / elem.name;
+        
+        if(S_ISREG(elem.metadata.st_mode)){
+            if(access(backPath.c_str(), R_OK) != 0){
+                std::cerr << "[!] Can not read from file : " << elem.name << " .\n";
+                exit(-1);
+            }
+        }
+
+        // 每一个要打包的文件等于header + data，利用elem的信息填充header和data。
+        Pack pack(elem, backPath);
+
+        pack.write_one_bkfile_into(bkfile_path);
+    }
 
 }
