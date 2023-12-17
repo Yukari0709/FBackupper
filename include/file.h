@@ -3,6 +3,9 @@
 
 #include "parser.h"
 
+#define HEADER_MAGIC_NUMBER 0xFBACFFEF
+
+// 遍历时存放与过滤代打包文件
 typedef struct File{
     std::string name;
     std::string path;
@@ -24,5 +27,19 @@ typedef struct File{
 // };
 
 }File;
+
+// pack过程中一个文件的header
+typedef struct header_for_one_file{
+    // 这里的name并不是一个name，而是从root下来的相对路径
+    std::string name;
+    struct stat metadata;
+    // 这里应该要加上硬链接标识
+}Header_for_one_file;
+
+typedef struct header_for_whole_file{
+    time_t cre_time;    // 创建时间
+    // checksum
+    // 压缩/加密
+}Header_for_whole_file;
 
 #endif

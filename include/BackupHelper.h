@@ -3,6 +3,7 @@
 
 #include "parser.h"
 #include "file.h"
+#include "Pack.h"
 
 class BackupHelper{
 private:
@@ -19,6 +20,9 @@ private:
     std::string passwd;
 
     std::vector<File> all_files;
+    
+    // 创建的要写入的备份文件路径
+    std::string bkfile_path;
 
     void initBackupFile();
    
@@ -42,5 +46,7 @@ public:
     void getctime();
     void getctimetrans();
 };
+
+extern std::map<ino_t, std::string> inoToStringMap;
 
 #endif

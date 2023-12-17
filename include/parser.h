@@ -7,6 +7,9 @@
 #include <sstream>
 #include <vector>
 #include <sys/stat.h>
+#include <unistd.h>
+#include <cstdint>
+#include <cstring>
 #include <fstream>
 #include "CLI11.hpp"
 
