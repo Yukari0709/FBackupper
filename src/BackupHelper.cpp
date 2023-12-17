@@ -29,10 +29,10 @@ BackupHelper::BackupHelper(const Paras &p): _compress(p.compress), _encrypt(p.en
 
 void BackupHelper::doFilter(){
     processPath(input_path);
-    std::cout << "筛选前：" << std::endl;
-    for (const auto &element : all_files){
-        std::cout << element.name << " ";
-    }
+    // std::cout << "筛选前：" << std::endl;
+    // for (const auto &element : all_files){
+    //     std::cout << element.name << " ";
+    // }
     
     if(!typenum.empty()){
         for (auto it = all_files.begin(); it != all_files.end(); ) {
@@ -77,10 +77,10 @@ void BackupHelper::doFilter(){
         }
      }
     } 
-    std::cout << "\n筛选后：" << std::endl;
-    for (const auto &element : all_files){
-        std::cout <<  element.name << " ";
-    }
+    // std::cout << "\n筛选后：" << std::endl;
+    // for (const auto &element : all_files){
+    //     std::cout <<  element.name << " ";
+    // }
 
 }
 
