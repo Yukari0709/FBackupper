@@ -1,5 +1,5 @@
-#ifndef _COM_ZIP_H
-#define _COM_ZIP_H
+#ifndef _ZIP_UNZIP_H
+#define _ZIP_UNZIP_H
 
 #include <iostream>
 
