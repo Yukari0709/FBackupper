@@ -18,7 +18,9 @@ class Pack{
 private:
     // src_filePath为待备份文件的绝对路径
     std::string src_filePath;
+
     Header_for_one_file header;
+    std::string LNK_Target;
 
     void get_file_data();
 
@@ -29,7 +31,8 @@ public:
     Pack(Header &rec_header);
 
     void write_one_bkfile_into(std::string dest_filepath);
-
+    // Use when back link files
+    void write_one_bkfile_into(std::string dest_filepath, char * target);
 };
 
 #endif

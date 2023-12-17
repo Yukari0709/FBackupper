@@ -21,10 +21,8 @@ void Pack::write_one_bkfile_into(std::string dest_filepath){
     Header real_header;
     strncpy(real_header.name, this->header.name.c_str(), sizeof(real_header.name) - 1);
     real_header.metadata = this->header.metadata;
-    // if(S_ISLNK(this->header.metadata.st_mode)){
-        
-    // }
 
+    // 写入header
     bk_file.write(reinterpret_cast<const char*>(& real_header), sizeof(real_header));
     bk_file.close();
 
@@ -43,4 +41,22 @@ void Pack::write_one_bkfile_into(std::string dest_filepath){
     // TODO: 处理其他文件的数据块
 
     return;
+}
+
+void Pack::write_one_bkfile_into(std::string dest_filepath, char * target){
+    std::ofstream bk_file(dest_filepath, std::ios::out | std::ios::app);
+
+    if(!bk_file.is_open()){
+        exit(-1);
+    }
+
+    Header real_header;
+    strncpy(real_header.name, this->header.name.c_str(), sizeof(real_header.name) - 1);
+    real_header.metadata = this->header.metadata;
+    strncpy(real_header.link_target, target, sizeof(real_header.link_target) - 1);
+
+    // 写入header
+    bk_file.write(reinterpret_cast<const char*>(& real_header), sizeof(real_header));
+    bk_file.close();
+
 }

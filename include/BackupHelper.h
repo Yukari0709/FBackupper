@@ -38,4 +38,6 @@ public:
     void doBackup();
 };
 
+extern std::map<ino_t, std::string> inoToStringMap;
+
 #endif

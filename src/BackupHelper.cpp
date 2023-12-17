@@ -1,5 +1,7 @@
 #include "BackupHelper.h"
 
+std::map<ino_t, std::string> inoToStringMap;
+
 void BackupHelper::doBackup(){
     // TODO：
     // doFilter();
@@ -117,6 +119,15 @@ void BackupHelper::doPack(){
         exit(-1);
     }
     this->all_files.push_back(tmp1);
+
+    File tmp2;
+    tmp2.name = "test/sym_link";
+    tmp_path = path_to_test + '/' + tmp2.name;
+    if (stat(tmp_path.c_str(), &tmp2.metadata) != 0){
+        std::cout << "[!] ERROR: Can not get metadata for 123. \n";
+        exit(-1);
+    }    
+    this->all_files.push_back(tmp2);
     // For develop
 
     // check output file
@@ -125,26 +136,58 @@ void BackupHelper::doPack(){
         exit(-1);
     }
 
-    for(const File &elem : all_files){
+    std::filesystem::path i_path = this->input_path;
+    std::filesystem::path parentPath = i_path.parent_path();
 
+    for(const File &elem : all_files){
         // check whether file can be readed
         // input_path和name有重合的地方，需要处理一下
-        std::filesystem::path i_path = this->input_path;
-        std::filesystem::path parentPath = i_path.parent_path();
 
         std::filesystem::path backPath = parentPath / elem.name;
-        
-        if(S_ISREG(elem.metadata.st_mode)){
+
+        if (std::filesystem::is_symlink(backPath)) {
+            // 处理sym link文件
+            char targetPath[100];
+            ssize_t bytesRead = readlink(backPath.c_str(), targetPath, 100 - 1);
+            if (bytesRead != -1) {
+                targetPath[bytesRead] = '\0';
+            }
+
+            // 如果源文件也要备份，那么先备份源文件。
+
+            // elem的metadata要更新，用lstat重新获取
+            lstat(backPath.c_str(), &elem.metadata);
+            Pack pack(elem, backPath);
+            pack.write_one_bkfile_into(bkfile_path, targetPath);
+
+        }
+        else if(elem.metadata.st_nlink > 1){
+            // 处理hard link文件
+            ino_t linkedInode = elem.metadata.st_ino;
+            auto it = inoToStringMap.find(linkedInode);
+
+            if (it != inoToStringMap.end()) {
+                const char * link_t = it->second.c_str();
+
+                Pack pack(elem, backPath);
+                pack.write_one_bkfile_into(bkfile_path, link_t);
+            } else{
+
+                inoToStringMap[linkedInode] = elem.name;
+
+                Pack pack(elem, backPath);
+                pack.write_one_bkfile_into(bkfile_path);
+            }
+        }
+        else if(S_ISREG(elem.metadata.st_mode)){
+
             if(access(backPath.c_str(), R_OK) != 0){
                 std::cerr << "[!] Can not read from file : " << elem.name << " .\n";
                 exit(-1);
             }
+            Pack pack(elem, backPath);
+            pack.write_one_bkfile_into(bkfile_path);
         }
-
-        // 每一个要打包的文件等于header + data，利用elem的信息填充header和data。
-        Pack pack(elem, backPath);
-
-        pack.write_one_bkfile_into(bkfile_path);
     }
 
 }
