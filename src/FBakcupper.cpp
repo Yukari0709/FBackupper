@@ -1,30 +1,35 @@
 #include "parser.h"
+#include "BackupHelper.h"
+#include "RestoreHelper.h"
 
 int main(int argc, char **argv){
 
     if(argc < 2){
         Usage();
+        exit(0);
     }
 
+    
+    Paras paras;
+    initConfig(paras);
     // TODO : parser
-    doParaParser(argc, argv);
+    doParaParser(argc, argv, paras);
 
-    // if(备份){
-    //     if(还原) 报错；
+    if(paras.backup){
         
-    //     files = filter();
+        BackupHelper b_helper(paras);
 
-    //     out_file = pack(files);
+        b_helper.doBackup();
 
-    //     if(压缩){
-    //         out_file = docompress(out_file);
-    //     }
-    //     if(加密){
-    //         out_file = doencrypt(out_file);
-    //     }
+        // TODO: 压缩，加密
+    }
+    else if(paras.restore){
+        // TODO: 解压，解密
 
-    //     out_file = metadate(out_file);
+        RestoreHelper r_helper(paras);
 
-    //     return;
-    // }
+        r_helper.doRestore();
+        
+    }
 }
+
