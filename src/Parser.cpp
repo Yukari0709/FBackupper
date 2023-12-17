@@ -43,7 +43,7 @@ void Usage(void){
     std::cout << "      --repath ReguExp    Select files using regular expressions and their names, like \'*.o\' .\n";
     std::cout << "      --rename ReguExp    Select files using regular expressions and their names, like \'*.o\' .\n";
     std::cout << "      --size t1 t2        Select files within a specified size range, like \'1000 2000\'(Bytes).\n";
-    std::cout << "      --ctime t1 t2       Select files within a specified creation time range, like \'2023-12-11-20:31:12 2023-12-11-20:30:00\'.\n";
+    std::cout << "      --ctime t1 t2       Select files within a specified last changed time range, like \'2023-12-11-20:31:12 2023-12-11-20:30:00\'.\n";
     std::cout << "      --mtime t1 t2       Select files within a specified last modified time range, like \'2023-12-11-20:31:12 2023-12-11-20:30:00\'.\n";
     std::cout << "      --type n1 n2 ...    Select types of file to be back upped: 1 -> Regular file; 2 -> Directory; 3 -> Symbolic link; 4 -> FIFO or pipe.\n";
 }

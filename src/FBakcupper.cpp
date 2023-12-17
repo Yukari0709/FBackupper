@@ -23,7 +23,9 @@ int main(int argc, char **argv){
         // TODO： 过滤文件，返回vector类型的文件列表。
 
         // b_helper.doBackup();
-        // b_helper.doFilter();
+        b_helper.gettype();
+        b_helper.doFilter();
+        
     }
 }
 

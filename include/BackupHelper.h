@@ -14,11 +14,11 @@ private:
     const bool _encrypt;
     std::string re_name;
     std::string re_path;
-    std::vector<int> size;
+    std::vector<off_t> size;
     std::vector<std::string> ctime;
     std::vector<std::string> mtime;
     std::string passwd;
-
+    std::vector<int> typenum;
     std::vector<File> all_files;
     
     // 创建的要写入的备份文件路径
@@ -30,7 +30,7 @@ private:
     void doCompress();
     void doEncrypt();
     void processPath(const std::string& current_path);
-    bool checkFilesCreationTime(const struct stat& metadata);
+    bool checkFilesChangeTime(const struct stat& metadata);
     bool checkFilesModifyTime(const struct stat& metadata);
     bool checkFilesSize(const struct stat& metadata);
     bool checkFilesAddress(const struct stat& metadata);
@@ -44,7 +44,9 @@ public:
     void doBackup();
     void doFilter();
     void getctime();
+    void gettype();
     void getctimetrans();
+    void getmtimetrans();
 };
 
 extern std::map<ino_t, std::string> inoToStringMap;
