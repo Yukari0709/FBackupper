@@ -22,25 +22,64 @@ void BackupHelper::doBackup(){
 
 }
 
-BackupHelper::BackupHelper(const Paras &p): _compress(p.compress), _encrypt(p.encrypt), re_name(p.re_name), size(p.size), ctime(p.ctime), mtime(p.mtime), passwd(p.password){
+BackupHelper::BackupHelper(const Paras &p): _compress(p.compress), _encrypt(p.encrypt), re_name(p.re_name), size(p.size), ctime(p.ctime), mtime(p.mtime), passwd(p.password), typenum(p.typenum){
     input_path = p.input_path;
     output_path = p.output_path;
 }
 
 void BackupHelper::doFilter(){
     processPath(input_path);
+    std::cout << "筛选前：" << std::endl;
     for (const auto &element : all_files){
-        // std::cout << element.name << std::endl;
+        std::cout << element.name << " ";
     }
+    
+    if(!typenum.empty()){
+        for (auto it = all_files.begin(); it != all_files.end(); ) {
+        bool flag_type = checkFilesType(it->metadata);
+        if (flag_type) {
+            ++it;  
+        } else {
+            it = all_files.erase(it); 
+        }
+     }
+    }
+
+    if(!size.empty()){
+        for (auto it = all_files.begin(); it != all_files.end(); ) {
+        bool flag_size = checkFilesSize(it->metadata);
+        if (flag_size) {
+            ++it;  
+        } else {
+            it = all_files.erase(it); 
+        }
+     }
+    }
+
     if(!ctime.empty()){
         for (auto it = all_files.begin(); it != all_files.end(); ) {
-        bool flag_ctime = checkFilesCreationTime(it->metadata);
+        bool flag_ctime = checkFilesChangeTime(it->metadata);
         if (flag_ctime) {
             ++it;  
         } else {
             it = all_files.erase(it); 
         }
      }
+    }
+    
+     if(!mtime.empty()){
+        for (auto it = all_files.begin(); it != all_files.end(); ) {
+        bool flag_mtime = checkFilesModifyTime(it->metadata);
+        if (flag_mtime) {
+            ++it;  
+        } else {
+            it = all_files.erase(it); 
+        }
+     }
+    } 
+    std::cout << "\n筛选后：" << std::endl;
+    for (const auto &element : all_files){
+        std::cout <<  element.name << " ";
     }
 
 }
@@ -85,8 +124,9 @@ std::time_t convertStringToTime(const std::string& str_time) {
     return std::mktime(&tm);
 }
 
-bool BackupHelper::checkFilesCreationTime(const struct stat& metadata){
+bool BackupHelper::checkFilesChangeTime(const struct stat& metadata){
     std::time_t creation_time = metadata.st_ctim.tv_sec;
+    std::cout << creation_time << std::endl ;
     std::time_t t1 = convertStringToTime(ctime[0]);
     std::time_t t2 = convertStringToTime(ctime[1]);
     if(creation_time >= t1 && creation_time <= t2){
@@ -100,11 +140,27 @@ bool BackupHelper::checkFilesCreationTime(const struct stat& metadata){
 
 
 bool BackupHelper::checkFilesModifyTime(const struct stat& metadata){
-
+    std::time_t modify_time = metadata.st_mtim.tv_sec;
+    std::cout << modify_time << std::endl ;
+    std::time_t t1 = convertStringToTime(mtime[0]);
+    std::time_t t2 = convertStringToTime(mtime[1]);
+    if(modify_time >= t1 && modify_time <= t2){
+        return true;
+    }
+    else{
+        return false;
+    }
 }
 
 bool BackupHelper::checkFilesSize(const struct stat& metadata){
-
+    off_t f_size = metadata.st_size;
+    std::cout << "size value: " << f_size << std::endl;
+    if(f_size >= size[0] && f_size <= size[1]){
+        return true;
+    }
+    else{
+        return false;
+    }
 }
 
 bool BackupHelper::checkFilesAddress(const struct stat& metadata){
@@ -116,7 +172,51 @@ bool BackupHelper::checkFilesName(const struct stat& metadata){
 }
 
 bool BackupHelper::checkFilesType(const struct stat& metadata){
-
+    int flag = 0;
+    for(const auto &t_num : typenum){
+        if(t_num !=1 && t_num !=2 && t_num !=3 && t_num !=4){
+            std::cerr << "输入了未知的文件类型：" << t_num << std::endl;
+        }
+        if(t_num == 1){
+            if(S_ISREG(metadata.st_mode)){
+                flag += 1;
+            }
+            else{
+                ;
+            }
+        }
+        if(t_num == 2){
+            if(S_ISDIR(metadata.st_mode)){
+                flag += 1;
+            }
+            else{
+                ;
+            }
+        }
+        if(t_num == 3){
+            if(S_ISLNK(metadata.st_mode)){
+                flag += 1;
+            }
+            else{
+                ;
+            }
+        }
+        if(t_num == 4){
+            if(S_ISFIFO(metadata.st_mode)){
+                flag += 1;
+            }
+            else{
+                ;
+            }
+        }
+        
+    }
+    if(flag == typenum.size()){
+        return true;
+    }
+    else{
+        return false;
+    }
 }
 
 std::string generateFileName(void){
@@ -263,5 +363,18 @@ void BackupHelper::getctimetrans(){
     for(const auto &ctime : ctime){
         std::time_t t = convertStringToTime(ctime);
         std::cout << t << std::endl;
+    }
+}
+
+void BackupHelper::getmtimetrans(){
+    for(const auto &mtime : mtime){
+        std::time_t t = convertStringToTime(mtime);
+        std::cout << t << std::endl;
+    }
+}
+
+void BackupHelper::gettype(){
+    for(const auto &ftype : typenum){
+        std::cout << ftype << std::endl;
     }
 }

@@ -26,8 +26,9 @@ int main(int argc, char **argv){
     else if(paras.restore){
         // TODO: 解压，解密
 
-        RestoreHelper r_helper(paras);
-        r_helper.doRestore();
+        // b_helper.doBackup();
+        b_helper.gettype();
+        b_helper.doFilter();
         
     }
 }

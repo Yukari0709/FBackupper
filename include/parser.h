@@ -34,7 +34,7 @@ typedef struct Paras{
     std::string password;
     std::string re_name;
     std::string re_path;
-    std::vector<int> size;
+    std::vector<off_t> size;
     std::vector<std::string> ctime;
     std::vector<std::string> mtime;
     std::vector<int> typenum;
