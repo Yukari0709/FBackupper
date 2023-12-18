@@ -1,4 +1,6 @@
 #include "BackupHelper.h"
+#include <regex>
+#include <algorithm>
 
 std::map<ino_t, std::string> inoToStringMap;
 
@@ -22,21 +24,47 @@ void BackupHelper::doBackup(){
 
 }
 
-BackupHelper::BackupHelper(const Paras &p): _compress(p.compress), _encrypt(p.encrypt), re_name(p.re_name), size(p.size), ctime(p.ctime), mtime(p.mtime), passwd(p.password), typenum(p.typenum){
+BackupHelper::BackupHelper(const Paras &p): _compress(p.compress), _encrypt(p.encrypt), re_name(p.re_name), re_path(p.re_path),size(p.size), ctime(p.ctime), mtime(p.mtime), passwd(p.password), typenum(p.typenum){
     input_path = p.input_path;
     output_path = p.output_path;
 }
 
+
+
 void BackupHelper::doFilter(){
     processPath(input_path);
-    // std::cout << "筛选前：" << std::endl;
-    // for (const auto &element : all_files){
-    //     std::cout << element.name << " ";
-    // }
+    /*
+     std::cout << "筛选前：" << std::endl;
+     for (const auto &element : all_files){
+         std::cout << element.name << " ";
+     }
+    */
     
+    if(!re_path.empty()){
+        for (auto it = std::next(all_files.begin()); it != all_files.end(); ) {
+        bool flag_address = checkFilesAddress(it->name);
+        if (flag_address) {
+            ++it;  
+        } else {
+            it = all_files.erase(it); 
+        }
+     }
+    }
+
+    if(!re_name.empty()){
+        for (auto it = std::next(all_files.begin()); it != all_files.end(); ) {
+        bool flag_name = checkFilesName(it->name);
+        if (flag_name) {
+            ++it;  
+        } else {
+            it = all_files.erase(it); 
+        }
+     }
+    }
+
     if(!typenum.empty()){
-        for (auto it = all_files.begin(); it != all_files.end(); ) {
-        bool flag_type = checkFilesType(it->metadata);
+        for (auto it = std::next(all_files.begin()); it != all_files.end(); ) {
+        bool flag_type = checkFilesType(it->name);
         if (flag_type) {
             ++it;  
         } else {
@@ -46,7 +74,7 @@ void BackupHelper::doFilter(){
     }
 
     if(!size.empty()){
-        for (auto it = all_files.begin(); it != all_files.end(); ) {
+        for (auto it = std::next(all_files.begin()); it != all_files.end(); ) {
         bool flag_size = checkFilesSize(it->metadata);
         if (flag_size) {
             ++it;  
@@ -57,7 +85,7 @@ void BackupHelper::doFilter(){
     }
 
     if(!ctime.empty()){
-        for (auto it = all_files.begin(); it != all_files.end(); ) {
+        for (auto it = std::next(all_files.begin()); it != all_files.end(); ) {
         bool flag_ctime = checkFilesChangeTime(it->metadata);
         if (flag_ctime) {
             ++it;  
@@ -68,7 +96,7 @@ void BackupHelper::doFilter(){
     }
     
      if(!mtime.empty()){
-        for (auto it = all_files.begin(); it != all_files.end(); ) {
+        for (auto it = std::next(all_files.begin()); it != all_files.end(); ) {
         bool flag_mtime = checkFilesModifyTime(it->metadata);
         if (flag_mtime) {
             ++it;  
@@ -77,10 +105,12 @@ void BackupHelper::doFilter(){
         }
      }
     } 
-    // std::cout << "\n筛选后：" << std::endl;
-    // for (const auto &element : all_files){
-    //     std::cout <<  element.name << " ";
-    // }
+    /*
+    std::cout << "\n筛选后：" << std::endl;
+     for (const auto &element : all_files){
+         std::cout <<  element.name << " ";
+     }
+    */ 
 
 }
 
@@ -117,6 +147,60 @@ void BackupHelper::processPath(const std::string& current_path) {
         }
     }
 
+std::string getAbsolutePath(const std::string& fileName, const std::string& currentPath) {
+    size_t lastSlashPos = currentPath.find_last_of('/');
+    std::string ab_path;
+    if (lastSlashPos != std::string::npos) {
+        ab_path =  currentPath.substr(0, lastSlashPos);
+    } else {
+        // 如果没有找到斜杠，返回原始字符串
+        return currentPath;
+    }
+    ab_path = ab_path + '/' + fileName;
+   // std::cout << ab_path << std::endl;
+    return ab_path;
+}
+
+int getFileType(const std::string& path){
+    struct stat fileStat;
+    //首先判断给定的目录文件是否能获取文件信息
+    if (lstat(path.c_str(), &fileStat) != 0) {
+        perror("Error getting file status");
+        return -1;
+    }
+
+    if (S_ISFIFO(fileStat.st_mode)) {
+        // 管道文件
+        return 4;
+    } else if (S_ISDIR(fileStat.st_mode)) {
+        // 目录文件
+        return 2;
+    } else {
+        // 不是管道也不是目录，进一步判断软链接
+        if (S_ISLNK(fileStat.st_mode)) {
+            // 软链接
+            return 3;
+        } else {
+            // 不是软链接，再判断是否为硬链接
+            if (fileStat.st_nlink > 1) {
+                // 硬链接
+                return 3;
+            } else if (S_ISREG(fileStat.st_mode)) {
+                // 常规文件
+                return 1;
+            } else {
+                // 其他类型
+                return -1;
+            }
+        }
+    }
+}
+    
+
+bool findNumber(int target, const std::vector<int>& typenum) {
+    auto it = std::find(typenum.begin(), typenum.end(), target);
+    return it != typenum.end();
+}
 
 std::time_t convertStringToTime(const std::string& str_time) {
     struct tm tm;
@@ -126,7 +210,7 @@ std::time_t convertStringToTime(const std::string& str_time) {
 
 bool BackupHelper::checkFilesChangeTime(const struct stat& metadata){
     std::time_t creation_time = metadata.st_ctim.tv_sec;
-    std::cout << creation_time << std::endl ;
+   // std::cout << creation_time << std::endl ;
     std::time_t t1 = convertStringToTime(ctime[0]);
     std::time_t t2 = convertStringToTime(ctime[1]);
     if(creation_time >= t1 && creation_time <= t2){
@@ -141,7 +225,7 @@ bool BackupHelper::checkFilesChangeTime(const struct stat& metadata){
 
 bool BackupHelper::checkFilesModifyTime(const struct stat& metadata){
     std::time_t modify_time = metadata.st_mtim.tv_sec;
-    std::cout << modify_time << std::endl ;
+   // std::cout << modify_time << std::endl ;
     std::time_t t1 = convertStringToTime(mtime[0]);
     std::time_t t2 = convertStringToTime(mtime[1]);
     if(modify_time >= t1 && modify_time <= t2){
@@ -154,7 +238,7 @@ bool BackupHelper::checkFilesModifyTime(const struct stat& metadata){
 
 bool BackupHelper::checkFilesSize(const struct stat& metadata){
     off_t f_size = metadata.st_size;
-    std::cout << "size value: " << f_size << std::endl;
+   // std::cout << "size value: " << f_size << std::endl;
     if(f_size >= size[0] && f_size <= size[1]){
         return true;
     }
@@ -163,14 +247,24 @@ bool BackupHelper::checkFilesSize(const struct stat& metadata){
     }
 }
 
-bool BackupHelper::checkFilesAddress(const struct stat& metadata){
-
+bool BackupHelper::checkFilesAddress(const std::string& name){
+    std::regex regex_pattern(re_path);
+    return std::regex_match(name, regex_pattern);
 }
 
-bool BackupHelper::checkFilesName(const struct stat& metadata){
+bool BackupHelper::checkFilesName(const std::string& name){
+    // 构建正则表达式对象
+    std::regex regex_pattern(re_name);
 
+    // 从相对路径/文件名中提取文件名
+    size_t pos = name.find_last_of('/');
+    std::string file_name = (pos != std::string::npos) ? name.substr(pos + 1) : name;
+  // std::cout << file_name << std::endl;
+    // 使用 regex_match 检查文件名是否与正则表达式匹配
+    return std::regex_match(file_name, regex_pattern);
 }
 
+/*
 bool BackupHelper::checkFilesType(const struct stat& metadata){
     int flag = 0;
     for(const auto &t_num : typenum){
@@ -211,12 +305,21 @@ bool BackupHelper::checkFilesType(const struct stat& metadata){
         }
         
     }
-    if(flag == typenum.size()){
+    if(flag >= 1){
         return true;
     }
     else{
         return false;
     }
+}
+*/
+bool BackupHelper::checkFilesType(const std::string &name){
+    std::string file_abpath;
+    file_abpath = getAbsolutePath(name, input_path);
+    int num;
+    num = getFileType(file_abpath);
+    //std::cout << num <<std::endl;
+    return findNumber(num, typenum);
 }
 
 std::string generateFileName(void){
@@ -353,6 +456,7 @@ void BackupHelper::doPack(){
 
 }
 
+/*
 void BackupHelper::getctime(){
     for(const auto &ctime : ctime){
         std::cout << ctime << std::endl;
@@ -378,3 +482,9 @@ void BackupHelper::gettype(){
         std::cout << ftype << std::endl;
     }
 }
+
+void BackupHelper::getrepath(){
+    std::cout << re_path << std::endl;
+}
+
+*/

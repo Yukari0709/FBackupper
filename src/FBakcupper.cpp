@@ -20,7 +20,8 @@ int main(int argc, char **argv){
         BackupHelper b_helper(paras);
 
         b_helper.doBackup();
-
+    
+        // b_helper.getrepath();
         // TODO: 压缩，加密
     }
     else if(paras.restore){

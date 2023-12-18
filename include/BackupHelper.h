@@ -33,9 +33,9 @@ private:
     bool checkFilesChangeTime(const struct stat& metadata);
     bool checkFilesModifyTime(const struct stat& metadata);
     bool checkFilesSize(const struct stat& metadata);
-    bool checkFilesAddress(const struct stat& metadata);
-    bool checkFilesName(const struct stat& metadata);
-    bool checkFilesType(const struct stat& metadata);
+    bool checkFilesAddress(const std::string &name);
+    bool checkFilesName(const std::string &name);
+    bool checkFilesType(const std::string &name);
 
 public:
     BackupHelper(const Paras &p);
@@ -43,10 +43,11 @@ public:
 
     void doBackup();
     void doFilter();
-    void getctime();
-    void gettype();
-    void getctimetrans();
-    void getmtimetrans();
+    // void getctime();
+    // void gettype();
+    // void getctimetrans();
+    // void getmtimetrans();
+    // void getrepath();
 };
 
 std::filesystem::path changeRELtoABS(std::filesystem::path &path, char *rel_path);

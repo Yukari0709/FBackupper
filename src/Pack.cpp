@@ -62,7 +62,19 @@ void Pack::write_one_bkfile_into(std::string dest_filepath, char * target){
 
 }
 
+void HandleParentDir(std::filesystem::path path){
+    std::filesystem::path parentPath = path.parent_path();
+    if(std::filesystem::exists(parentPath)){
+        return; 
+    }
+    else{
+        HandleParentDir(parentPath);
+        std::filesystem::create_directories(parentPath);
+    }
+}
+
 void Pack::restore_from_header(std::filesystem::path &path, std::ifstream& inputFile){
+
     // 根据一个文件头恢复一个文件到path
     if(this->restore_header.magicNumber != HEADER_MAGIC_NUMBER){
         std::cerr << "[!] ERROR: Unexpected magic number. \n" ;
@@ -74,11 +86,13 @@ void Pack::restore_from_header(std::filesystem::path &path, std::ifstream& input
 
     std::cout << "[*] Restoring file: " << restore_header.name << std::endl;
 
-    if(std::filesystem::exists(path / relative_path)){
+    if(std::filesystem::exists(absolute_path)){
         // 已存在？
         std::cout << "[!] Target path already exist.\n";
         exit(0);
     }
+
+    HandleParentDir(absolute_path);
     
     mode_t fileType = restore_header.metadata.st_mode & S_IFMT;
 
