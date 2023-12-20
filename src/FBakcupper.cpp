@@ -12,7 +12,7 @@ int main(int argc, char **argv){
     
     Paras paras;
     initConfig(paras);
-    // TODO : parser
+    // TODO : parser, replace output_path when necessary
     doParaParser(argc, argv, paras);
 
     if(paras.backup){
@@ -31,6 +31,11 @@ int main(int argc, char **argv){
 
         r_helper.doRestore();
         
+    }
+    else if(paras.list){
+        ListHelper l_helper(paras);
+
+        l_helper.doList();
     }
 }
 

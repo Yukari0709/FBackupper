@@ -128,7 +128,7 @@ void doParaParser(int argc, char **argv, Paras &paras){
 
     app.add_flag("-b,--backup", paras.backup, "Backup");
     app.add_flag("-r,--restore", paras.restore, "Restore");
-    app.add_flag("-l,--list", paras.restore, "List");
+    app.add_flag("-l,--list", paras.list, "List");
     app.add_option("-f,--files", paras.input_path, "Specify the path of files(or directory) to be backed up or restore.");
     app.add_flag("-c,--compress", paras.compress);
     app.add_flag("-e,--encrypt", paras.encrypt);

@@ -50,6 +50,14 @@ public:
     // void getrepath();
 };
 
+class ListHelper{
+private:
+    Paras global_paras;
+public:
+    ListHelper(const Paras &p);
+    void doList();
+};
+
 std::filesystem::path changeRELtoABS(std::filesystem::path &path, char *rel_path);
 
 extern std::map<ino_t, std::string> inoToStringMap;

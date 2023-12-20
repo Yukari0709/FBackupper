@@ -20,7 +20,9 @@ void BackupHelper::doBackup(){
 
     std::cout << "[+] Finish packing into file: " << this->bkfile_path << std::endl;
 
+    // TODO：压缩，加密
 
+    // TODO：写入文件头
 
 }
 
@@ -488,3 +490,28 @@ void BackupHelper::getrepath(){
 }
 
 */
+
+ListHelper::ListHelper(const Paras &p){
+    this->global_paras = p;
+}
+
+void ListHelper::doList(){
+
+    if(global_paras.input_path.empty()){
+        std::filesystem::path BKfile_path(this->global_paras.output_path);
+        std::cout << "[*] Backup file path: " << this->global_paras.output_path << std::endl;
+        std::cout << "[*] All backup files: \n";
+        try {
+            for (const auto& entry : std::filesystem::directory_iterator(BKfile_path)) {
+                std::cout << entry.path().filename() << std::endl;
+            }
+        } catch (const std::filesystem::filesystem_error& ex) {
+            std::cerr << "[!] Error accessing the directory: " << ex.what() << std::endl;
+            return 1;
+        }
+
+        std::cout << "\nUse -i [filename] to get more information of a backup file. \n";
+        return;
+    }
+    // TODO: 根据选择的文件打印文件头信息
+}
