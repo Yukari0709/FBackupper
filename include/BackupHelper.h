@@ -4,21 +4,11 @@
 #include "parser.h"
 #include "file.h"
 #include "Pack.h"
+#include "TaskHelper.h"
 
-class BackupHelper{
+class BackupHelper : public TaskHelper{
 private:
-    std::string output_path;
 
-    std::string input_path;
-    const bool _compress;
-    const bool _encrypt;
-    std::string re_name;
-    std::string re_path;
-    std::vector<off_t> size;
-    std::vector<std::string> ctime;
-    std::vector<std::string> mtime;
-    std::string passwd;
-    std::vector<int> typenum;
     std::vector<File> all_files;
     
     // 创建的要写入的备份文件路径
@@ -29,33 +19,38 @@ private:
     void doPack();
     void doCompress();
     void doEncrypt();
+
+public:
+    BackupHelper(const Paras &p);
+    // ~BackupHelper();
+
+    void doTask();
+
+};
+
+
+class Filter : public TaskHelper{
+private:
+    std::vector<File> all_files;
+
     void processPath(const std::string& current_path);
     bool checkFilesChangeTime(const struct stat& metadata);
     bool checkFilesModifyTime(const struct stat& metadata);
     bool checkFilesSize(const struct stat& metadata);
     bool checkFilesAddress(const std::string &name);
     bool checkFilesName(const std::string &name);
-    bool checkFilesType(const std::string &name);
-
+    bool checkFilesType(const std::string &name);    
 public:
-    BackupHelper(const Paras &p);
-    // ~BackupHelper();
-
-    void doBackup();
-    void doFilter();
-    // void getctime();
-    // void gettype();
-    // void getctimetrans();
-    // void getmtimetrans();
-    // void getrepath();
+    Filter(const Paras &p);
+    void doTask();
+    std::vector<File> getFiles();
 };
 
-class ListHelper{
-private:
-    Paras global_paras;
+
+class ListHelper : public TaskHelper{
 public:
     ListHelper(const Paras &p);
-    void doList();
+    void doTask();
 };
 
 std::filesystem::path changeRELtoABS(std::filesystem::path &path, char *rel_path);

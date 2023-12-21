@@ -1,12 +1,11 @@
 #include "RestoreHelper.h"
 
-RestoreHelper::RestoreHelper(const Paras &p){
+RestoreHelper::RestoreHelper(const Paras &p) : TaskHelper(p){
     this->input_name = p.input_path;
-    this->paras = p;
 }
 
-void RestoreHelper::doRestore(){
-    std::string BackfilesPath = this->paras.output_path;
+void RestoreHelper::doTask(){
+    std::string BackfilesPath = this->global_paras.output_path;
 
     std::filesystem::path Backfiles_Path(BackfilesPath);
     std::filesystem::path ipnut_bkfile_name(this->input_name);
@@ -14,7 +13,7 @@ void RestoreHelper::doRestore(){
     // 待恢复的pack文件
     std::filesystem::path Targetfile_Path = Backfiles_Path / ipnut_bkfile_name;
     // 恢复到的path
-    std::filesystem::path rec_Path(this->paras.rec_path);
+    std::filesystem::path rec_Path(this->global_paras.rec_path);
 
     if(access(Targetfile_Path.c_str(), R_OK) != 0){
         std::cerr << "[!] Can not Read from bk file: " << Targetfile_Path << std::endl;

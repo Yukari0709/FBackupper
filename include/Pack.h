@@ -25,8 +25,6 @@ private:
     // 恢复的时候读取到的pack头
     Header restore_header;
 
-    void get_file_data();
-
 public:
     // Use when backup
     Pack(const File &file, std::filesystem::path backPath);

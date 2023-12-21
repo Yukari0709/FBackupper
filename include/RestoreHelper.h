@@ -3,15 +3,15 @@
 
 #include "parser.h"
 #include "Pack.h"
+#include "TaskHelper.h"
 
-class RestoreHelper{
+class RestoreHelper : public TaskHelper{
 private:
     std::string input_name;
-    Paras paras;
 
 public:
     RestoreHelper(const Paras &p);
-    void doRestore();
+    void doTask();
 };
 
 #endif

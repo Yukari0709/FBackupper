@@ -175,6 +175,12 @@ void doParaParser(int argc, char **argv, Paras &paras){
     }
 
     if(paras.restore){
+        if(paras.output_path.empty())
+        {
+            std::cout<< "[!] Please specify the output target using -o. \n";
+            exit(-1);
+        }
+
         std::filesystem::path currentPath = std::filesystem::current_path();
         std::filesystem::path tmp = changeRELtoABS1(currentPath, paras.output_path.c_str());
 
