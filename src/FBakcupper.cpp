@@ -11,11 +11,10 @@ int main(int argc, char **argv){
 
     
     Paras paras;
+    initConfig(paras);
     doParaParser(argc, argv, paras);
 
     if(paras.backup){
-        // specify output_dir
-        initConfig(paras);
 
         BackupHelper b_helper(paras);
 
@@ -33,8 +32,6 @@ int main(int argc, char **argv){
         
     }
     else if(paras.list){
-
-        initConfig(paras);
 
         ListHelper l_helper(paras);
 

@@ -38,8 +38,12 @@ typedef struct header_for_one_file{
 
 typedef struct header_for_whole_file{
     time_t cre_time;    // 创建时间
-    // checksum
-    // 压缩/加密
-}Header_for_whole_file;
+    char comment[100];  // 用户添加的注释
+    char srcPath[100];  // 备份源路径
+    bool compress;
+    bool encrypt;
+
+    header_for_whole_file(): comment{}, srcPath{} , compress(false), encrypt(false){}
+}Header_for_whole_file; // 216 bytes
 
 #endif

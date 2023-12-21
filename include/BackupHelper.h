@@ -5,6 +5,7 @@
 #include "file.h"
 #include "Pack.h"
 #include "TaskHelper.h"
+#include "ZIP_UNZIP.h"
 
 class BackupHelper : public TaskHelper{
 private:

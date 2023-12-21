@@ -60,12 +60,12 @@ std::string GetPathFromConfig(const std::string& configFilename) {
 
 void Usage(void){
     std::cout << "Usage: FBackupper [Options] [Paras] ... \n\nOptions:\n";
-    // std::cout << "  -h, --help          Display this help message.\n";
     std::cout << "  -b, --backup            Do File Backup.\n";
     std::cout << "  -r, --restore           Do File Restore.\n";
     std::cout << "  -l, --list              List all the backupped files.\n";
-    std::cout << "  -i, --input         Specify the path of files(or directory) to be backed up or restore.\n";
-    std::cout << "  -o, --output         Specify where the path of RESTORE files.\n";
+    std::cout << "  -i, --input             Specify the path of files(or directory) to be backed up or restore.\n";
+    std::cout << "  -m, --comment           Add comment to this backup task.\n";
+    std::cout << "  -o, --output            Specify where the path of RESTORE files.\n";
     // std::cout << "      --path              View the path where the backup files are stored/\n";
     std::cout << "  -c, --compress          Compress backup packages.\n";
     std::cout << "  -e, --encrypt           Encrypt backup packages, must be used with -p!\n";
@@ -141,6 +141,7 @@ void doParaParser(int argc, char **argv, Paras &paras){
     app.add_option("--size", paras.size);
     app.add_option("--ctime", paras.ctime);
     app.add_option("--mtime", paras.mtime);
+    app.add_option("-m,--comment", paras.comment);
     
     
     app.add_option("--type", paras.typenum);
@@ -175,16 +176,16 @@ void doParaParser(int argc, char **argv, Paras &paras){
     }
 
     if(paras.restore){
-        if(paras.output_path.empty())
+        if(paras.rec_path.empty())
         {
             std::cout<< "[!] Please specify the output target using -o. \n";
             exit(-1);
         }
 
         std::filesystem::path currentPath = std::filesystem::current_path();
-        std::filesystem::path tmp = changeRELtoABS1(currentPath, paras.output_path.c_str());
+        std::filesystem::path tmp = changeRELtoABS1(currentPath, paras.rec_path.c_str());
 
-        paras.output_path = tmp.string();
+        paras.rec_path = tmp.string();
     }
 
     return;

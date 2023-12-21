@@ -27,7 +27,9 @@ typedef struct Paras{
     bool restore;
     bool list;
     std::string input_path;
+    // backup使用
     std::string output_path;
+    // restore使用
     std::string rec_path;
     bool compress;
     bool encrypt;
@@ -38,6 +40,7 @@ typedef struct Paras{
     std::vector<std::string> ctime;
     std::vector<std::string> mtime;
     std::vector<int> typenum;
+    std::string comment;
 
     Paras() : backup(false), restore(false), compress(false), encrypt(false), help(false), list(false){}
 }Paras;

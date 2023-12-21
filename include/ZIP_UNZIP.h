@@ -6,17 +6,16 @@
 #include "HuffmanEncode.h"
 #include "HuffmanDecode.h"
 
-using namespace huffman;
+// using namespace huffman;
 
-void compression(const std::string& srcfilename, const std::string& destfilename){
-    HuffmanEncode huffen;
-    huffen.encode(srcfilename.data(), destfilename.data());
+namespace huffman{
+    void compression(const std::string& srcfilename, const std::string& destfilename);
+    void unzip(const std::string& srcfilename, const std::string& destfilename);
 }
 
-void unzip(const std::string& srcfilename, const std::string& destfilename){
-    HuffmanDecode huffde;
-    huffde.decode(srcfilename.data(), destfilename.data());
-}
+// void huffman::compression(const std::string& srcfilename, const std::string& destfilename);
+
+// void huffman::unzip(const std::string& srcfilename, const std::string& destfilename);
 
 
 

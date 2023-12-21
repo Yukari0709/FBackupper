@@ -4,9 +4,27 @@
 
 std::map<ino_t, std::string> inoToStringMap;
 
+void writeHeader(std::string src, std::string dest, header_for_whole_file &header){
+    std::ofstream outFile(dest, std::ios::out | std::ios::binary | std::ios::trunc);
+    outFile.write(reinterpret_cast<char*>(&header), sizeof(header));
+
+    std::ifstream originalFile(src, std::ios::binary);
+
+    char byte;
+    while (originalFile.get(byte)) {
+        outFile.put(byte);
+    }
+
+    outFile.close();
+    originalFile.close();
+
+    std::filesystem::remove(src);
+    std::filesystem::rename(dest, dest.substr(0, dest.size() - 1));
+}
+
 void BackupHelper::doTask(){
 
-    // doFilter();
+    // 自定义过滤
     Filter filter(global_paras);
     filter.doTask();
     this->all_files = filter.getFiles();
@@ -18,16 +36,49 @@ void BackupHelper::doTask(){
 
     // 创建新文件
     initBackupFile();
-    
+
     // 打包
     doPack();
 
     std::cout << "[+] Finish packing into file: " << this->bkfile_path << std::endl;
 
-    // if(needCompre) TODO：压缩，加密
+    // 压缩
+    if(global_paras.compress){
+        // using namespace huffman;
+        std::string desFilePath = this->bkfile_path + ".com";
 
-    // TODO：写入文件头
+        huffman::compression(this->bkfile_path, desFilePath);
 
+        std::cout << "[+] Finish compressing into file: " << desFilePath << std::endl;
+
+        try {
+            std::filesystem::remove(this->bkfile_path);
+        } catch (const std::filesystem::filesystem_error& e) {
+            std::cerr << "[!] Error deleting file: " << e.what() << std::endl;
+            return -1;
+        }
+
+        this->bkfile_path = desFilePath;
+    }
+
+    // 加密
+    if(global_paras.encrypt){
+
+    }
+
+    // 写入文件头
+    header_for_whole_file header;
+
+    header.cre_time = std::time(nullptr);
+    if(!this->global_paras.comment.empty()){
+        strncpy(header.comment, this->global_paras.comment.c_str(), 100 - 1);
+    }
+    strncpy(header.srcPath, global_paras.input_path.c_str(), 100 - 1);
+    header.compress = global_paras.compress;
+    header.encrypt = global_paras.encrypt;
+
+    std::string tmp_out = this->bkfile_path + 't';
+    writeHeader(this->bkfile_path, tmp_out, header);
 }
 
 BackupHelper::BackupHelper(const Paras &p): TaskHelper(p) {
@@ -235,8 +286,9 @@ ListHelper::ListHelper(const Paras &p) : TaskHelper(p){
 
 void ListHelper::doTask(){
 
+    std::filesystem::path BKfile_path(this->global_paras.output_path);
+
     if(global_paras.input_path.empty()){
-        std::filesystem::path BKfile_path(this->global_paras.output_path);
         std::cout << "[*] Backup file path: " << this->global_paras.output_path << std::endl;
         std::cout << "[*] All backup files: \n";
         try {
@@ -252,6 +304,29 @@ void ListHelper::doTask(){
         return;
     }
     // TODO: 根据选择的文件打印文件头信息
+    std::filesystem::path file = BKfile_path / global_paras.input_path;
+    
+    header_for_whole_file header;
+    std::ifstream inFile(file, std::ios::binary);
+    inFile.read(reinterpret_cast<char*>(&header), sizeof(header));
+    inFile.close();
+
+    struct tm* timeInfo = std::localtime(&header.cre_time);
+    char buffer[20];
+    std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", timeInfo);
+
+    std::cout << "Detailed information for back file: " << global_paras.input_path << std::endl;
+    std::cout << "    Create time:            " << buffer << std::endl;
+    std::cout << "    Origin directory Path:  " << header.srcPath << std::endl;
+    std::cout << "    User comment:           " << header.comment << std::endl;
+    std::cout << "    Backup mode:            ";
+    if(header.compress){
+        std::cout << "Compress(Huffman algorithm) ";
+    }
+    if(header.encrypt){
+
+    }
+    std::cout << std::endl;
 }
 
 Filter::Filter(const Paras &p) : TaskHelper(p) {
