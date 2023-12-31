@@ -13,6 +13,8 @@ Originally developed by Shao Jiang jshao404@gmail.com, Junjie Wang and Leedfree.
 ```bash
 sudo apt-get install libssl-dev
 ```
+- **CMake:** >= 3.12.
+- **gcc＆g++:** >= 9.4.0.
 
 # Build
 > We strongly recommend building under Ubuntu 20.04 version.
