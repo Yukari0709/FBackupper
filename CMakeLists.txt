@@ -8,6 +8,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 include_directories(include)
 
 file(GLOB SOURCES "src/*.cpp")
-add_compile_options(-O2 -g -fpermissive -w)
+add_compile_options(-O2 -g -fpermissive -w -lssl -lcrypto)
 
 add_executable(FBackupper ${SOURCES})
+
+target_link_libraries(FBackupper ssl crypto)

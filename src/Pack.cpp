@@ -77,7 +77,7 @@ void Pack::restore_from_header(std::filesystem::path &path, std::ifstream& input
 
     // 根据一个文件头恢复一个文件到path
     if(this->restore_header.magicNumber != HEADER_MAGIC_NUMBER){
-        std::cerr << "[!] ERROR: Unexpected magic number. \n" ;
+        std::cerr << "[!] ERROR: Unexpected magic number. Please check whether the password entered is correct. \n" ;
         exit(-1);
     }
 

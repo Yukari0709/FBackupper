@@ -23,7 +23,15 @@ void RestoreHelper::doTask(){
 
     // uncompress
     if(header.encrypt){
-        
+        std::string tmp_unencrypt = tmp.string() + ".unenc";
+        if(!global_paras.password.empty()){
+            En_Decryption::AesDecryptFile(tmp.string(), tmp_unencrypt, global_paras.password.c_str());
+        }
+        else En_Decryption::AesDecryptFile(tmp.string(), tmp_unencrypt);
+        // 删除未解密的tmp
+        std::filesystem::remove(tmp);
+        tmp = tmp_unencrypt;
+        // std::cout << "[*] Finish decrypting file." << std::endl;
     }
 
     if(header.compress){
@@ -32,6 +40,7 @@ void RestoreHelper::doTask(){
         // 删除未解压的tmp
         std::filesystem::remove(tmp);
         tmp = tmp_uncompress;
+        // std::cout << "[*] Finish uncompressing file." << std::endl;
     }
     
     // unpack

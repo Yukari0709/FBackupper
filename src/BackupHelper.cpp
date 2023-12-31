@@ -49,7 +49,7 @@ void BackupHelper::doTask(){
 
         huffman::compression(this->bkfile_path, desFilePath);
 
-        std::cout << "[+] Finish compressing into file: " << desFilePath << std::endl;
+        std::cout << "[+] Finish compressing." << std::endl;
 
         try {
             std::filesystem::remove(this->bkfile_path);
@@ -63,7 +63,23 @@ void BackupHelper::doTask(){
 
     // 加密
     if(global_paras.encrypt){
+        std::string desFilePath = this->bkfile_path + ".enc";
 
+        if(!global_paras.password.empty()){
+            En_Decryption::AesEncryptFile(this->bkfile_path, desFilePath, global_paras.password.c_str());
+        }
+        else En_Decryption::AesEncryptFile(this->bkfile_path, desFilePath);
+
+        std::cout << "[+] Finish encrypting." << std::endl;
+
+        try {
+            std::filesystem::remove(this->bkfile_path);
+        } catch (const std::filesystem::filesystem_error& e) {
+            std::cerr << "[!] Error deleting file: " << e.what() << std::endl;
+            return -1;
+        }
+
+        this->bkfile_path = desFilePath;
     }
 
     // 写入文件头

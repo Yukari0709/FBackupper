@@ -8,8 +8,8 @@
 #define RELESE_ARRAY(P) if(P) {delete[] P;  P = NULL;}
 
 namespace En_Decryption{
-    int AesEncryptFile(std::string src_path, std::string dest_path, const  char Key[32]);
-    int AesDecryptFile(std::string src_path, std::string dest_path, const  char Key[32]);
+    int AesEncryptFile(std::string src_path, std::string dest_path, const  char Key[32] = "default_keys");
+    int AesDecryptFile(std::string src_path, std::string dest_path, const  char Key[32] = "default_keys");
 }
 
 #endif
