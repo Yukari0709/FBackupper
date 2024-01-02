@@ -14,8 +14,7 @@ A lightweight file backup and recovery software. Supported features include:
 - User-defined file filtering;
 - File Pack, Compress and Encrypt.
 
-Originally developed by Shao Jiang jshao404@gmail.com, Junjie Wang and Leedfree.
-
+Originally developed by Shao Jiang jshao404@gmail.com, Junjie Wang and Leedfree.  
 # Dependency 
 - **OpenSSL:** = 1.1.1.
 ```bash
