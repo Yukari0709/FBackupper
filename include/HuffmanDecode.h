@@ -47,8 +47,9 @@ namespace huffman{
                 if(!((_fileHead->flag[0] == 'n') && _fileHead->flag[1] == 'a'
                    && _fileHead->flag[2] == 'g' && _fileHead->flag[3] == 'i'
                    && _fileHead->flag[4] == 's' && _fileHead->flag[5] == 'a')){
-                    printf("not support file format: %s", filename);
-                    return false;
+                    // printf("not support file format: %s", filename);
+                    std::cout << "[!] ERROR: Bad Compress header, please check your password.\n";
+                    exit(-1);
                 }
 
                 //读取所有字符及其对应频率

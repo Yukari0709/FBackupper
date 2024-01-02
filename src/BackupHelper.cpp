@@ -40,7 +40,13 @@ void BackupHelper::doTask(){
     // 打包
     doPack();
 
-    std::cout << "[+] Finish packing into file: " << this->bkfile_path << std::endl;
+    size_t lastSlashPos = this->bkfile_path.find_last_of('/');
+    std::string result;
+    if (lastSlashPos != std::string::npos) {
+        result = this->bkfile_path.substr(lastSlashPos + 1);
+    }
+
+    std::cout << "[+] Finish packing into file: " << result << std::endl;
 
     // 压缩
     if(global_paras.compress){
@@ -49,7 +55,13 @@ void BackupHelper::doTask(){
 
         huffman::compression(this->bkfile_path, desFilePath);
 
-        std::cout << "[+] Finish compressing." << std::endl;
+        size_t lastSlashPos = desFilePath.find_last_of('/');
+        std::string result;
+        if (lastSlashPos != std::string::npos) {
+            result = desFilePath.substr(lastSlashPos + 1);
+        }
+
+        std::cout << "[+] Finish compressing into file: " << result <<std::endl;
 
         try {
             std::filesystem::remove(this->bkfile_path);
@@ -70,7 +82,13 @@ void BackupHelper::doTask(){
         }
         else En_Decryption::AesEncryptFile(this->bkfile_path, desFilePath);
 
-        std::cout << "[+] Finish encrypting." << std::endl;
+        size_t lastSlashPos = desFilePath.find_last_of('/');
+        std::string result;
+        if (lastSlashPos != std::string::npos) {
+            result = desFilePath.substr(lastSlashPos + 1);
+        }
+
+        std::cout << "[+] Finish encrypting into file:" <<  result <<std::endl;
 
         try {
             std::filesystem::remove(this->bkfile_path);
@@ -320,8 +338,13 @@ void ListHelper::doTask(){
         return;
     }
     // TODO: 根据选择的文件打印文件头信息
-    std::filesystem::path file = BKfile_path / global_paras.input_path;
     
+    std::filesystem::path file = BKfile_path / global_paras.input_path;
+    if(!std::filesystem::exists(file)){
+        std::cout << "[!] ERROR: please give a correct file name. \n";
+        exit(-1);
+    }
+
     header_for_whole_file header;
     std::ifstream inFile(file, std::ios::binary);
     inFile.read(reinterpret_cast<char*>(&header), sizeof(header));
@@ -340,7 +363,7 @@ void ListHelper::doTask(){
         std::cout << "Compress(Huffman algorithm) ";
     }
     if(header.encrypt){
-
+        std::cout << "Encrypt(AES256 algorithm);";
     }
     std::cout << std::endl;
 }
