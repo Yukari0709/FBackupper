@@ -6,9 +6,10 @@ COPY . /FBackupper
 
 ENV TZ="Asia/Shanghai"
 RUN sed -i s@/archive.ubuntu.com/@/mirrors.aliyun.com/@g /etc/apt/sources.list
+ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update && \
-    apt-get install -y build-essential cmake libssl-dev
+RUN apt update && \
+    apt install -y build-essential cmake libssl-dev
 
 RUN rm -rf build && mkdir build
 RUN cd build && cmake .. && make && make install

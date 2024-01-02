@@ -46,7 +46,7 @@ void BackupHelper::doTask(){
         result = this->bkfile_path.substr(lastSlashPos + 1);
     }
 
-    std::cout << "[+] Finish packing into file: " << result << std::endl;
+    std::cout << "[+] Finish packing. "<< std::endl;
 
     // 压缩
     if(global_paras.compress){
@@ -56,12 +56,11 @@ void BackupHelper::doTask(){
         huffman::compression(this->bkfile_path, desFilePath);
 
         size_t lastSlashPos = desFilePath.find_last_of('/');
-        std::string result;
         if (lastSlashPos != std::string::npos) {
             result = desFilePath.substr(lastSlashPos + 1);
         }
 
-        std::cout << "[+] Finish compressing into file: " << result <<std::endl;
+        std::cout << "[+] Finish compressing. "  <<std::endl;
 
         try {
             std::filesystem::remove(this->bkfile_path);
@@ -83,12 +82,11 @@ void BackupHelper::doTask(){
         else En_Decryption::AesEncryptFile(this->bkfile_path, desFilePath);
 
         size_t lastSlashPos = desFilePath.find_last_of('/');
-        std::string result;
         if (lastSlashPos != std::string::npos) {
             result = desFilePath.substr(lastSlashPos + 1);
         }
 
-        std::cout << "[+] Finish encrypting into file:" <<  result <<std::endl;
+        std::cout << "[+] Finish encrypting. " <<std::endl;
 
         try {
             std::filesystem::remove(this->bkfile_path);
@@ -113,6 +111,8 @@ void BackupHelper::doTask(){
 
     std::string tmp_out = this->bkfile_path + 't';
     writeHeader(this->bkfile_path, tmp_out, header);
+
+    std::cout << "\e[32m[+] Task done. Now you can use " << result << " as input to restore.\e[0m\n";
 }
 
 BackupHelper::BackupHelper(const Paras &p): TaskHelper(p) {
