@@ -96,7 +96,10 @@ void Pack::restore_from_header(std::filesystem::path &path, std::ifstream& input
     
     mode_t fileType = restore_header.metadata.st_mode & S_IFMT;
 
-    if(fileType == S_IFDIR){
+    if(fileType == S_IFIFO){
+        mkfifo(absolute_path.c_str(), restore_header.metadata.st_mode);
+    }
+    else if(fileType == S_IFDIR){
         // dir文件
         std::filesystem::create_directory(absolute_path);
     }

@@ -29,7 +29,7 @@ void BackupHelper::doTask(){
     filter.doTask();
     this->all_files = filter.getFiles();
 
-    if(all_files.empty() | all_files.size() == 1){
+    if(all_files.empty()){
         std::cout << "[!] Bad parameter, please check your input path.\n";
         exit(-1);
     }
@@ -310,6 +310,10 @@ void BackupHelper::doPack(){
             Pack pack(elem, backPath);
             pack.write_one_bkfile_into(bkfile_path);
         }
+        else if(S_ISFIFO(elem.metadata.st_mode)){
+            Pack pack(elem, backPath);
+            pack.write_one_bkfile_into(bkfile_path);
+        }
     }
 
 }
@@ -453,6 +457,11 @@ void Filter::processPath(const std::string& current_path){
             all_files.push_back(current_file);
         } else {
             std::cerr << "[!] Unable to obtain file information for the given path: " << current_path << std::endl;
+        }
+
+        // only one file
+        if(!std::filesystem::is_directory(current_path)){
+            return;
         }
 
         // 遍历给定路径下的文件和子目录
