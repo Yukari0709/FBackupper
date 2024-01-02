@@ -25,11 +25,18 @@ sudo apt-get install libssl-dev
 - **gcc＆g++:** >= 9.4.0.
 
 # Build
-> We strongly recommend building under Ubuntu 20.04 version, or use Docker.
+> We strongly recommend building under Ubuntu 20.04 version, or using Docker.
+
+* **Build from source**
 
 mkdir build && cd build  
 cmake ..  
-make && make install
+make && make install  
+
+* **Build using docker**
+
+sudo docker build -t fbackupper .  
+sudo docker run -it fbackupper /bin/bash  
 
 # Usage
 ``` bash
