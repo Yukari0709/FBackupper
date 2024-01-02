@@ -25,11 +25,11 @@ sudo apt-get install libssl-dev
 - **gcc＆g++:** >= 9.4.0.
 
 # Build
-> We strongly recommend building under Ubuntu 20.04 version.
+> We strongly recommend building under Ubuntu 20.04 version, or use Docker.
 
 mkdir build && cd build  
 cmake ..  
-make  
+make && make install
 
 # Usage
 ``` bash
